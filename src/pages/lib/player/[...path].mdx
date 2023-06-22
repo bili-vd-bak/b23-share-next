@@ -1,0 +1,150 @@
+import { useSSG } from "nextra/ssg";
+import { getVideoData } from "@/utils/getList";
+import Artplayer from "@/components/Artplayer";
+import artplayerPluginDanmuku from "artplayer-plugin-danmuku";
+
+export function getStaticPaths() {
+  //this property is an Array of URLs ("paths") that should be statically generated at build-time. The returned paths must match the dynamic route shape.
+  return {
+    paths: [],
+    fallback: true,
+  };
+}
+
+export const getStaticProps = async ({ params }) => {
+  const path = params.path;
+  if (
+    !path ||
+    !path[0] ||
+    !path[1] ||
+    !path[2] ||
+    !path[3] ||
+    path[0] == ("0" || 0) ||
+    path[1] == ("0" || 0) ||
+    path[2] == ("0" || 0) ||
+    path[3] == ("0" || 0)
+  )
+    return {
+      props: {
+        ssg: {
+          dlinks: [],
+          path: [],
+        },
+      },
+      revalidate: 3600,
+    };
+  else {
+    const a = await getVideoData(path[0], path[1], path[2], path[3]);
+    return {
+      props: {
+        ssg: {
+          dlinks: a,
+          path: path,
+        },
+      },
+      revalidate: 3600,
+    };
+  }
+};
+
+export function BD() {
+  const { dlinks, path } = useSSG() || { dlinks: [], path: [] };
+  if (!dlinks || !dlinks.video) return <div>获取失败。</div>;
+  return (
+    <div>
+      <a href={dlinks.video} target="_blank">
+        下载视频
+      </a>{" "}
+      {dlinks.danmaku ? (
+        <a href={dlinks.danmaku} target="_blank">
+          下载弹幕
+        </a>
+      ) : (
+        ""
+      )}{" "}
+      {dlinks.sub_chs ? (
+        <a href={dlinks.sub_chs} target="_blank">
+          下载中文(简体)字幕
+        </a>
+      ) : (
+        ""
+      )}{" "}
+      {dlinks.sub_cht ? (
+        <a href={dlinks.sub_cht} target="_blank">
+          下载中文(繁体)字幕
+        </a>
+      ) : (
+        ""
+      )}
+    </div>
+  );
+}
+
+export function AP() {
+  const { dlinks, path } = useSSG() || { dlinks: [], path: [] };
+  if (!dlinks || !dlinks.video) return <div>获取失败。</div>;
+  return (
+    <div>
+      <Artplayer
+        option={{
+          url: dlinks.video,
+          autoSize: true,
+          playbackRate: true,
+          aspectRatio: true,
+          setting: true,
+          hotkey: true,
+          mutex: true,
+          fullscreen: true,
+          fullscreenWeb: true,
+          fastForward: true,
+          whitelist: ["*"],
+          subtitleOffset: true,
+          miniProgressBar: true,
+          subtitle:
+            dlinks.sub_chs || dlinks.sub_cht
+              ? {
+                  url: dlinks.sub_chs || dlinks.sub_cht,
+                  type: "srt",
+                  encoding: "utf-8",
+                  style: {
+                    color: "#FFFFFF",
+                    background: "rgba(0, 0, 0, 0.4)",
+                    border: "1px solid rgba(0,0,0,0)",
+                    "border-radius": "5px",
+                    width: "300px",
+                    "margin-inline": "31.5%"
+                  },
+                }
+              : {},
+          plugins: dlinks.danmaku
+            ? [
+                artplayerPluginDanmuku({
+                  danmuku: dlinks.danmaku,
+                }),
+              ]
+            : [],
+        }}
+        style={{
+          width: "500px",
+          height: "300px",
+          margin: "30px auto 0",
+        }}
+        getInstance={(art) => console.info(art)}
+      />
+    </div>
+
+);
+}
+
+# 仓库 下载&播放
+
+## 下载
+
+<BD />
+
+## 播放
+
+<div style={{ overflow: "auto" }}>
+  手机端可滑动本行文字调整播放器位置，全屏(横屏)以取得正确字幕、弹幕位置。
+  <AP />
+</div>

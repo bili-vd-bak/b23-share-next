@@ -1,0 +1,133 @@
+import { useSSG } from "nextra/ssg";
+import { getEp } from "@/utils/getList";
+import Link from "next/link";
+import { encodeURI } from "js-base64";
+
+export function getStaticPaths() {
+  //this property is an Array of URLs ("paths") that should be statically generated at build-time. The returned paths must match the dynamic route shape.
+  return {
+    paths: [],
+    fallback: true,
+  };
+}
+
+export const getStaticProps = async ({ params }) => {
+  const path = params.path;
+  if (
+    !path ||
+    !path[0] ||
+    !path[1] ||
+    path[0] == ("0" || 0) ||
+    path[1] == ("0" || 0)
+  )
+    return {
+      props: {
+        ssg: {
+          title: "出错了",
+          evaluate: "出错了",
+          ep: [],
+          path: [],
+        },
+      },
+      revalidate: 3600,
+    };
+  else {
+    const a = await getEp(path[0], path[1]);
+    return {
+      props: {
+        ssg: {
+          title: a.title,
+          evaluate: a.evaluate,
+          ep: a.ep,
+          path: path,
+        },
+      },
+      revalidate: 3600,
+    };
+  }
+};
+
+export function BasicData() {
+  const ssg = useSSG() || { title: "", evaluate: "", ep: [], path: [] };
+  const { title, evaluate, ep, path } = ssg;
+  return (
+    <table>
+      <thead>
+        <tr>
+          <th>项目</th>
+          <th>详情</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>ID</td>
+          <td>{path[1] || "出错了？？？"}</td>
+        </tr>
+        <tr>
+          <td>标题</td>
+          <td>{title || "出错了？？？"}</td>
+        </tr>
+        <tr>
+          <td>简介</td>
+          <td>{evaluate || "出错了？？？"}</td>
+        </tr>
+        <tr>
+          <td>总集数</td>
+          <td>{ep.length || "出错了？？？"}</td>
+        </tr>
+      </tbody>
+    </table>
+  );
+}
+
+export function List() {
+  const { ep, path } = useSSG() || { ep: [], path: [] };
+  const listItems = ep
+    .filter((data) => data.ffn.toLowerCase())
+    .sort((a, b) => a.ep - b.ep)
+    .map((i) => (
+      <tr key={i.ep}>
+        <td>{i.ep}</td>
+        <td>{i.sn}</td>
+        <td>{i.qn}</td>
+        <td>{i.fn}</td>
+        <td>{i.ot}</td>
+        {path[2] === "debug" ? <td>{JSON.stringify(i.co)}</td> : null}
+        <td>
+          <Link
+            href={`/lib/player/${path[0]}/${path[1]}/${i.ffn}/${encodeURI(
+              JSON.stringify(i.co)
+            )}`}
+          >
+            查看
+          </Link>
+        </td>
+      </tr>
+    ));
+  return (
+    <table>
+      <thead>
+        <tr>
+          <th>集数</th>
+          <th>标题</th>
+          <th>清晰度</th>
+          <th>编码方式</th>
+          <th>其它信息</th>
+          {path[2] === "debug" ? <th>视频-弹幕-字幕</th> : null}
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody>{listItems}</tbody>
+    </table>
+  );
+}
+
+# 仓库 番剧详情
+
+## 基本数据
+
+<BasicData />
+
+## 选集
+
+<List />

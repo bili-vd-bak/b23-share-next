@@ -1,0 +1,59 @@
+import { useSSG } from "nextra/ssg";
+import { getList } from "@/utils/getList";
+import Link from "next/link";
+
+export const sharelink =
+  "https://xrzcloud-my.sharepoint.com/:f:/g/personal/xrz_xrzyun_ml/EtnvTU56yoFDg4UlWvCl4owBXMCGKcPwRoaJaUi2zOTT2A?e=yRTdQ7";
+
+export const getStaticProps = async ({ params }) => {
+  const a = await getList(sharelink);
+  return {
+    props: {
+      ssg: {
+        accesskey: a.accesskey,
+        list: a.list,
+      },
+    },
+    revalidate: 3600,
+  };
+};
+
+export const Accesskey = () => {
+  // Get the data from SSG, and render it as a component.
+  const { accesskey } = useSSG();
+  return <code>{accesskey}</code>;
+};
+
+export const List = () => {
+  const { list, accesskey } = useSSG();
+  const listItems = list.map((i) => (
+    <tr key={i.id}>
+      <td>{i.id}</td>
+      <td>{i.name}</td>
+      <td>
+        <Link href={`/lib/ep/${accesskey}/${i.id}`}>查看</Link>
+      </td>
+    </tr>
+  ));
+  return (
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>番名</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody>{listItems}</tbody>
+    </table>
+  );
+};
+
+# 扩展仓库
+
+仓库链接 : {<code>{sharelink}</code>}  
+注释：本仓库含*来自 B 站但格式不同(非 BBDown 直下)番剧* 及 *自传番剧(来自其它源)*。
+
+<List />
+
+Base64Accesskey : <Accesskey/>
