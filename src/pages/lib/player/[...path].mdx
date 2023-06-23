@@ -2,6 +2,8 @@ import { useSSG } from "nextra/ssg";
 import { getVideoData } from "@/utils/getList";
 import Artplayer from "@/components/Artplayer";
 import artplayerPluginDanmuku from "artplayer-plugin-danmuku";
+import { decode } from "js-base64";
+import { useState } from "react";
 
 export function getStaticPaths() {
   //this property is an Array of URLs ("paths") that should be statically generated at build-time. The returned paths must match the dynamic route shape.
@@ -28,10 +30,10 @@ export const getStaticProps = async ({ params }) => {
       props: {
         ssg: {
           dlinks: [],
-          path: [],
+          co: [],
         },
       },
-      revalidate: 3600,
+      revalidate: 10,
     };
   else {
     const a = await getVideoData(path[0], path[1], path[2], path[3]);
@@ -39,16 +41,16 @@ export const getStaticProps = async ({ params }) => {
       props: {
         ssg: {
           dlinks: a,
-          path: path,
+          co: JSON.parse(decode(path[3])),
         },
       },
-      revalidate: 3600,
+      revalidate: 60,
     };
   }
 };
 
 export function BD() {
-  const { dlinks, path } = useSSG() || { dlinks: [], path: [] };
+  const { dlinks } = useSSG() || { dlinks: [], path: [] };
   if (!dlinks || !dlinks.video) return <div>获取失败。</div>;
   return (
     <div>
@@ -81,59 +83,73 @@ export function BD() {
 }
 
 export function AP() {
-  const { dlinks, path } = useSSG() || { dlinks: [], path: [] };
-  if (!dlinks || !dlinks.video) return <div>获取失败。</div>;
-  return (
-    <div>
-      <Artplayer
-        option={{
-          url: dlinks.video,
-          autoSize: true,
-          playbackRate: true,
-          aspectRatio: true,
-          setting: true,
-          hotkey: true,
-          mutex: true,
-          fullscreen: true,
-          fullscreenWeb: true,
-          fastForward: true,
-          whitelist: ["*"],
-          subtitleOffset: true,
-          miniProgressBar: true,
-          subtitle:
-            dlinks.sub_chs || dlinks.sub_cht
-              ? {
-                  url: dlinks.sub_chs || dlinks.sub_cht,
-                  type: "srt",
-                  encoding: "utf-8",
-                  style: {
-                    color: "#FFFFFF",
-                    background: "rgba(0, 0, 0, 0.4)",
-                    border: "1px solid rgba(0,0,0,0)",
-                    "border-radius": "5px",
-                    width: "300px",
-                    "margin-inline": "31.5%"
-                  },
-                }
-              : {},
-          plugins: dlinks.danmaku
-            ? [
-                artplayerPluginDanmuku({
-                  danmuku: dlinks.danmaku,
-                }),
-              ]
-            : [],
-        }}
-        style={{
-          width: "500px",
-          height: "300px",
-          margin: "30px auto 0",
-        }}
-        getInstance={(art) => console.info(art)}
-      />
-    </div>
-
-);
+  const { dlinks, co } = useSSG() || { dlinks: [], path: [] };
+  const [showMore, setShowMore] = useState(false);
+  function handleMoreClick() {
+    setShowMore(!showMore);
+  }
+  if (!dlinks || !dlinks.video) return <div>加载中.../获取失败?</div>;
+  else
+    return (
+      <div>
+        {!showMore &&
+          "当前视频可能无法在浏览器正常播放，请下载 弹弹Play 本地播放。"}
+        <br />
+        {!showMore && (
+          <button onClick={handleMoreClick}>
+            点击强制播放(可能黑屏、无声、无字幕)
+          </button>
+        )}
+        {showMore && (
+          <Artplayer
+            option={{
+              url: dlinks.video,
+              autoSize: true,
+              playbackRate: true,
+              aspectRatio: true,
+              setting: true,
+              hotkey: true,
+              mutex: true,
+              fullscreen: true,
+              fullscreenWeb: true,
+              fastForward: true,
+              whitelist: ["*"],
+              subtitleOffset: true,
+              miniProgressBar: true,
+              subtitle:
+                dlinks.sub_chs || dlinks.sub_cht
+                  ? {
+                      url: dlinks.sub_chs || dlinks.sub_cht,
+                      type: "srt",
+                      encoding: "utf-8",
+                      style: {
+                        color: "#FFFFFF",
+                        background: "rgba(0, 0, 0, 0.4)",
+                        border: "1px solid rgba(0,0,0,0)",
+                        "border-radius": "5px",
+                        width: "300px",
+                        "margin-inline": "31.5%",
+                      },
+                    }
+                  : {},
+              plugins: dlinks.danmaku
+                ? [
+                    artplayerPluginDanmuku({
+                      danmuku: dlinks.danmaku,
+                    }),
+                  ]
+                : [],
+            }}
+            style={{
+              width: "500px",
+              height: "300px",
+              margin: "30px auto 0",
+            }}
+            getInstance={(art) => console.info(art)}
+          />
+        )}
+      </div>
+    );
 }
 
 # 仓库 下载&播放

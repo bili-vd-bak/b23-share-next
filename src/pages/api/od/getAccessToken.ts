@@ -5,7 +5,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   res.status(200).json(await getAccessTokens(req.query?.d));
 };
 
-const timestamp = () => (Date.now() / 1000) | 0;
+const timestamp = () => (Date.now() / 1000) || 0;
 
 /**
  * 返回参数：\

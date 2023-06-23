@@ -29,7 +29,7 @@ export const getStaticProps = async ({ params }) => {
           path: [],
         },
       },
-      revalidate: 3600,
+      revalidate: 10,
     };
   else {
     const a = await getEp(path[0], path[1]);
@@ -42,7 +42,7 @@ export const getStaticProps = async ({ params }) => {
           path: path,
         },
       },
-      revalidate: 3600,
+      revalidate: 60,
     };
   }
 };

@@ -1,6 +1,9 @@
 import { useSSG } from "nextra/ssg";
 import { getList } from "@/utils/getList";
 import Link from "next/link";
+import { decode } from "js-base64";
+import * as FTC from "@/utils/FileTypeCheck";
+import { Callout } from "nextra/components";
 
 export const sharelink =
   "https://xrzcloud-my.sharepoint.com/:f:/g/personal/repository_xrzyun_ml/Egzw0ugxHrpCkFUA9CMyFDsB-3WxRaYj_E46k4Scn8BHkQ?e=AqGU4p";
@@ -22,6 +25,33 @@ export const Accesskey = () => {
   // Get the data from SSG, and render it as a component.
   const { accesskey } = useSSG();
   return <code>{accesskey}</code>;
+};
+
+export const D = () => {
+  const { accesskey } = useSSG();
+  function u2t(t) {
+    const unixTimestamp = new Date(t * 1000);
+    return unixTimestamp.toLocaleString();
+  }
+  const timestamp = () => Date.now() / 1000 || 0;
+  const decode_accesskey = JSON.parse(decode(accesskey));
+  const t_req = u2t(decode_accesskey.t),
+    jwt_payload = JSON.parse(
+      decode(FTC.EXT(FTC.FNeEXT(decode_accesskey.r[0].accesskey)))
+    );
+  const t_begin = u2t(jwt_payload.nbf),
+    t_end = u2t(jwt_payload.exp);
+  return (
+    <>
+      {timestamp() >= t_end + 60 && (
+        <Callout type="error" emoji="️🚫">
+          本页已过期，请刷新，确认本消息消失！
+        </Callout>
+      )}
+      本次请求时间：<code>{t_req}</code> 鉴权开始时间：<code>{t_begin}</code> 有效期：
+      <code>{t_end}</code>
+    </>
+  );
 };
 
 export const List = () => {
@@ -51,7 +81,10 @@ export const List = () => {
 
 # 主仓库
 
-仓库链接 : {<code>{sharelink}</code>}  
+仓库链接 : {<code>{sharelink}</code>}
+
+<D />{" "}
+
 注释：本仓库均来自 BiliBili,由 BBDown 直接下载视频,并手动下载获取`info.json`文件。
 
 <List />

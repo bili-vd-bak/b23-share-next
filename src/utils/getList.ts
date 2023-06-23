@@ -123,7 +123,7 @@ function fmtEpList(ori_list: { name: string }[], epsInfo: ep[]) {
     const fn = FTC.FNeEXT(i.name),
       ext = FTC.EXT(i.name);
     init_co_cache(fn); //防无弹幕、字幕
-    if (ext === "mp4") {
+    if (ext === "mp4" || ext === "mkv") {
       co_cache[fn].video = ext;
       const info = fn.split("-----");
       fmt_list.push({
