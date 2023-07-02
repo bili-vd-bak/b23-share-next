@@ -134,7 +134,7 @@ function fmtEpList(ori_list: { name: string }[], epsInfo: ep[]) {
         sn: epsInfo[Number(info[0]) - 1]?.share_copy || "", //B站上本集标题
         ot: info[3] || "", //文件名上备注的其它信息(第四段)
         co: {
-          video: co_cache[fn]?.video || "mp4",
+          video: co_cache[fn]?.video || "unknown",
           danmaku: co_cache[fn]?.danmaku || false,
           sub_chs:
             co_cache[fn]?.sub_chs ||

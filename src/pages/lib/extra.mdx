@@ -43,7 +43,7 @@ export const D = () => {
     t_end = u2t(jwt_payload.exp);
   return (
     <>
-      {timestamp() >= t_end + 60 && (
+      {timestamp() >= jwt_payload.exp - 60 && (
         <Callout type="error" emoji="️🚫">
           本页已过期，请刷新，确认本消息消失！
         </Callout>

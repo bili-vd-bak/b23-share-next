@@ -29,8 +29,13 @@ export const getStaticProps = async ({ params }) => {
     return {
       props: {
         ssg: {
-          dlinks: [],
-          co: [],
+          dlinks: { video: "", danmaku: "", sub_chs: "", sub_cht: "" },
+          co: {
+            video: "unknown",
+            danmaku: false,
+            sub_chs: false,
+            sub_cht: false,
+          },
         },
       },
       revalidate: 10,
@@ -41,7 +46,12 @@ export const getStaticProps = async ({ params }) => {
       props: {
         ssg: {
           dlinks: a,
-          co: JSON.parse(decode(path[3])),
+          co: JSON.parse(
+            decode(
+              path[3] ||
+                "eyJ2aWRlbyI6InVua25vd24iLCJkYW5tYWt1IjpmYWxzZSwic3ViX2NocyI6ZmFsc2UsInN1Yl9jaHQiOmZhbHNlfQ=="
+            )
+          ),
         },
       },
       revalidate: 60,
@@ -50,7 +60,15 @@ export const getStaticProps = async ({ params }) => {
 };
 
 export function BD() {
-  const { dlinks } = useSSG() || { dlinks: [], path: [] };
+  const { dlinks } = useSSG() || {
+    dlinks: { video: "", danmaku: "", sub_chs: "", sub_cht: "" },
+    co: {
+      video: "unknown",
+      danmaku: false,
+      sub_chs: false,
+      sub_cht: false,
+    },
+  };
   if (!dlinks || !dlinks.video) return <div>获取失败。</div>;
   return (
     <div>
@@ -83,24 +101,33 @@ export function BD() {
 }
 
 export function AP() {
-  const { dlinks, co } = useSSG() || { dlinks: [], path: [] };
+  const { dlinks, co } = useSSG() || {
+    dlinks: { video: "", danmaku: "", sub_chs: "", sub_cht: "" },
+    co: {
+      video: "unknown",
+      danmaku: false,
+      sub_chs: false,
+      sub_cht: false,
+    },
+  };
   const [showMore, setShowMore] = useState(false);
   function handleMoreClick() {
     setShowMore(!showMore);
   }
   if (!dlinks || !dlinks.video) return <div>加载中.../获取失败?</div>;
-  else
+  else {
+    const sm = co.video === "mp4" || showMore;
     return (
       <div>
-        {!showMore &&
+        {!sm &&
           "当前视频可能无法在浏览器正常播放，请下载 弹弹Play 本地播放。"}
         <br />
-        {!showMore && (
+        {!sm && (
           <button onClick={handleMoreClick}>
             点击强制播放(可能黑屏、无声、无字幕)
           </button>
         )}
-        {showMore && (
+        {sm && (
           <Artplayer
             option={{
               url: dlinks.video,
@@ -150,6 +177,7 @@ export function AP() {
         )}
       </div>
     );
+  }
 }
 
 # 仓库 下载&播放

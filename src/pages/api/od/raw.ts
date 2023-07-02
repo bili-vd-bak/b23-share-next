@@ -1,6 +1,7 @@
 import { wrapPath } from "./pathHandler";
 import { encode, decode } from "js-base64";
 import type { NextApiRequest, NextApiResponse } from "next";
+import { getAccessTokens } from "./getAccessToken";
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const { d, p }: { d?: string; p?: string } = req.query;
@@ -65,8 +66,15 @@ export async function onedrive_raw({ path = "", access_tokens_base64 = "" }) {
 
   let arr1 = [];
   for (const i of access_tokens.r) {
-    const access_token = i.accesskey;
-    const data = await getRaw(i.api, path, access_token);
+    let access_token = i.accesskey;
+    let data = await getRaw(i.api, path, access_token);
+    if (
+      data.error?.code === "unauthenticated" &&
+      data.error?.innerError?.code === "expiredToken"
+    ) {
+      access_token = (await getAccessTokens(i.sharelink)).r[0].accesskey;
+      data = await getRaw(i.api, path, access_token);
+    }
     if (data["@content.downloadUrl"]) {
       const downloadUrl: string = data["@content.downloadUrl"];
       arr1.push({ sharelink: i.sharelink, dlink: downloadUrl });

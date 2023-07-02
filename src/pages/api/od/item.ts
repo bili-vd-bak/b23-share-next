@@ -1,6 +1,7 @@
 import { wrapPath } from "./pathHandler";
 import { encode, decode } from "js-base64";
 import type { NextApiRequest, NextApiResponse } from "next";
+import { getAccessTokens } from "./getAccessToken";
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const { d, p, n }: { d?: string; p?: string; n?: string } = req.query;
@@ -101,9 +102,16 @@ export async function onedrive_item({
   let arr1 = [];
   for (const i of access_tokens.r) {
     if (i.accesskey) {
-      const access_token = i.accesskey;
+      let access_token = i.accesskey;
       let data: any;
       data = await getItem(i.api, path, nextPageToken, access_token);
+      if (
+        data.error?.code === "unauthenticated" &&
+        data.error?.innerError?.code === "expiredToken"
+      ) {
+        access_token = (await getAccessTokens(i.sharelink)).r[0].accesskey;
+        data = await getItem(i.api, path, nextPageToken, access_token);
+      }
       data = DataHandler(data);
       if (!data) data = { value: [] };
       arr1.push({ sharelink: i.sharelink, folder: data });
