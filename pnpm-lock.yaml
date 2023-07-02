@@ -5,9 +5,6 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
-  '@marsidev/react-turnstile':
-    specifier: ^0.2.1
-    version: registry.npmmirror.com/@marsidev/react-turnstile@0.2.1(react-dom@18.2.0)(react@18.2.0)
   '@types/node':
     specifier: 20.2.5
     version: registry.npmmirror.com/@types/node@20.2.5
@@ -84,19 +81,6 @@ packages:
       react-dom: ^16 || ^17 || ^18
     dependencies:
       client-only: registry.npmmirror.com/client-only@0.0.1
-      react: registry.npmmirror.com/react@18.2.0
-      react-dom: registry.npmmirror.com/react-dom@18.2.0(react@18.2.0)
-    dev: false
-
-  registry.npmmirror.com/@marsidev/react-turnstile@0.2.1(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-W/jxe6nn55wvbAwCOAtrm+tIg90/1oqBlbWwWaWJ2zuo3pmEBoaz3cnkU5PO5Hhi7NL51H46qL1syrkq/5CN0Q==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/@marsidev/react-turnstile/-/react-turnstile-0.2.1.tgz}
-    id: registry.npmmirror.com/@marsidev/react-turnstile/0.2.1
-    name: '@marsidev/react-turnstile'
-    version: 0.2.1
-    peerDependencies:
-      react: '>=16.8.0'
-      react-dom: '>=16.8.0'
-    dependencies:
       react: registry.npmmirror.com/react@18.2.0
       react-dom: registry.npmmirror.com/react-dom@18.2.0(react@18.2.0)
     dev: false
