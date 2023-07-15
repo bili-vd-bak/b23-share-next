@@ -17,6 +17,26 @@
 | `custom{番剧开播年月(number)}{此季度在本库中第几部}` | 不限来源，为仓库所有者自己上传 |
 |                        `ext`                         | 前缀，表`其它ID类别`+`custom`  |
 
+## 感谢
+
+API 提供：
+
+- OneDrive(SharePoint) `视频/弹幕 文件存储`
+- dandanplay.com (api.dandanplay.net) `弹幕库提供`
+
+网站部署：
+
+- Vercel
+- Netlify
+
+开源软件：
+
+- Next.js
+- Nextra
+- artplayer
+- [srt2vtt](https://github.com/DIYgod/DPlayer/issues/406#issuecomment-436840771) `src/utils/srt2vtt.ts`
+- [dandanplay API 所需参数提取](https://github.com/leng-yue/dandanplayer-react) `src/pages/toolbox/getFileHash.tsx`
+
 ## 您也想分享番剧？
 
 1. 获取一个 OneDrive 国际版企业/教育号(支持 sharepoint 分享)，可为 E5/A1 等。
@@ -37,18 +57,33 @@
 5. (`/bangumi-index/md/`)新建`番剧ID`文件夹。
 6. (`/bangumi-index/md/番剧ID/`)新建`info.json`,写入(`episodes`中第 n 个`share_copy`代表第 n 集的标题)
 
+|                   项目                   |                                                 说明                                                 |
+| :--------------------------------------: | :--------------------------------------------------------------------------------------------------: |
+|                   开关                   |                                          `0`-关闭 `1`-开启                                           |
+|    `settings`-`dandanplay_fn_search`     |                                          使用文件名搜索弹幕                                          |
+|           `result`-`episodes`            |                                `["第一集","第二集"]`或如下(高级配置)                                 |
+| `result`-`episodes`-`{number}`(高级配置) | `share_copy`-本集名称(必填) `dd_epid`-dandanplay 弹幕库 episodeId(可选) `dd_hash`-见侧栏工具箱(可选) |
+
 ```json filename="info.json"
 {
   "code": 0,
+  "settings": {
+    "dandanplay_fn_search": 1
+  },
   "result": {
     "title": "番剧名称",
     "evaluate": "（番剧简介）本仓库为手动上传。环大陆上映，故在此手动上传。",
     "episodes": [
       {
-        "share_copy": "第1集 xxx"
+        "share_copy": "第1集 xxx",
+        "dd_epid": 106880001
       },
       {
-        "share_copy": "第2集"
+        "share_copy": "第2集",
+        "dd_hash": "658d05841b9476ccc7420b3f0bb21c3b"
+      },
+      {
+        "share_copy": "第3集"
       }
     ]
   }

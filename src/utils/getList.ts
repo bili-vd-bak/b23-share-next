@@ -56,6 +56,8 @@ interface info_file {
 interface ep {
   share_copy: string;
   badge?: string;
+  dd_hash?: string;
+  dd_epid?: number;
 }
 
 function fmtEpInfoList(ori_info: info_file) {
@@ -85,6 +87,8 @@ interface co_struct {
   danmaku: boolean;
   sub_chs: boolean;
   sub_cht: boolean;
+  dd_hash: string;
+  dd_epid: number;
 }
 
 /**
@@ -102,6 +106,8 @@ function fmtEpList(ori_list: { name: string }[], epsInfo: ep[]) {
         danmaku: false,
         sub_chs: false,
         sub_cht: false,
+        dd_hash: "",
+        dd_epid: 0,
       };
   }
   for (const i of ori_list) {
@@ -125,13 +131,15 @@ function fmtEpList(ori_list: { name: string }[], epsInfo: ep[]) {
     init_co_cache(fn); //防无弹幕、字幕
     if (ext === "mp4" || ext === "mkv") {
       co_cache[fn].video = ext;
-      const info = fn.split("-----");
+      const info = fn.split("-----"),
+        ep = Number(info[0]),
+        epinfo = epsInfo[ep - 1];
       fmt_list.push({
         ffn: fn || "未知", //完整文件名
-        ep: Number(info[0]) || 0, //集数
+        ep: ep || 0, //集数
         qn: info[1] || "未知", //清晰度
         fn: info[2] || "未知", //编码方式
-        sn: epsInfo[Number(info[0]) - 1]?.share_copy || "", //B站上本集标题
+        sn: epinfo?.share_copy || epinfo || "", //B站上本集标题
         ot: info[3] || "", //文件名上备注的其它信息(第四段)
         co: {
           video: co_cache[fn]?.video || "unknown",
@@ -144,6 +152,8 @@ function fmtEpList(ori_list: { name: string }[], epsInfo: ep[]) {
             co_cache[fn]?.sub_cht ||
             co_cache[info[0] + "----------"]?.sub_cht ||
             false,
+          dd_hash: epinfo?.dd_hash || "",
+          dd_epid: epinfo?.dd_epid || 0,
         },
       });
     }
@@ -212,6 +222,7 @@ export async function getVideoData(
     sub_cht: info[0] + "----------.zh-Hant.srt",
   };
   let dlinks = { video: "", danmaku: "", sub_chs: "", sub_cht: "" };
+  let dd_helper = { hash: co.dd_hash, epid: co.dd_epid };
   dlinks.video = (
     await apis.od.raw({
       access_tokens_base64: accesskey,
@@ -239,5 +250,5 @@ export async function getVideoData(
         path: id_lib_path + id + "/" + fils.sub_cht,
       })
     )?.dlinks[0].dlink;
-  return dlinks;
+  return { dlinks, dd_helper };
 }

@@ -30,6 +30,7 @@ export const getStaticProps = async ({ params }) => {
       props: {
         ssg: {
           dlinks: { video: "", danmaku: "", sub_chs: "", sub_cht: "" },
+          dd_helper: { hash: "", epid: 0 },
           co: {
             video: "unknown",
             danmaku: false,
@@ -45,7 +46,8 @@ export const getStaticProps = async ({ params }) => {
     return {
       props: {
         ssg: {
-          dlinks: a,
+          dlinks: a.dlinks,
+          dd_helper: a.dd_helper,
           co: JSON.parse(
             decode(
               path[3] ||
@@ -62,6 +64,7 @@ export const getStaticProps = async ({ params }) => {
 export function BD() {
   const { dlinks } = useSSG() || {
     dlinks: { video: "", danmaku: "", sub_chs: "", sub_cht: "" },
+    dd_helper: { hash: "", epid: 0 },
     co: {
       video: "unknown",
       danmaku: false,
@@ -101,8 +104,9 @@ export function BD() {
 }
 
 export function AP() {
-  const { dlinks, co } = useSSG() || {
+  const { dlinks, dd_helper, co } = useSSG() || {
     dlinks: { video: "", danmaku: "", sub_chs: "", sub_cht: "" },
+    dd_helper: { hash: "", epid: 0 },
     co: {
       video: "unknown",
       danmaku: false,
@@ -111,16 +115,40 @@ export function AP() {
     },
   };
   const [showMore, setShowMore] = useState(false);
+  const [comments, setComments] = useState([]);
   function handleMoreClick() {
     setShowMore(!showMore);
   }
+  const fetchComments = async (episodeId) => {
+    const url = `https://api.dandanplay.net/api/v2/comment/${episodeId}?withRelated=true&chConvert=1`;
+    const response = await fetch(url);
+    const data = await response.json();
+    const comments = [];
+    for (const comment of data.comments) {
+      const params = comment.p.split(",");
+      comments.push({
+        text: comment.m,
+        time: parseInt(params[0]),
+        color: "#" + parseInt(params[2]).toString(16),
+        border: false,
+        mode: params[1] == 1 ? 0 : 1,
+      });
+    }
+    return comments;
+  };
+  let getDanAction = async (dd_helper) => {};
+  if (dd_helper.epid)
+    getDanAction = async (dd_helper) => {
+      const dans = await fetchComments(dd_helper.epid);
+      setComments(dans);
+      return dans;
+    };
   if (!dlinks || !dlinks.video) return <div>加载中.../获取失败?</div>;
   else {
     const sm = co.video === "mp4" || showMore;
     return (
       <div>
-        {!sm &&
-          "当前视频可能无法在浏览器正常播放，请下载 弹弹Play 本地播放。"}
+        {!sm && "当前视频可能无法在浏览器正常播放，请下载 弹弹Play 本地播放。"}
         <br />
         {!sm && (
           <button onClick={handleMoreClick}>
@@ -159,7 +187,13 @@ export function AP() {
                       },
                     }
                   : {},
-              plugins: dlinks.danmaku
+              plugins: dd_helper.epid
+                ? [
+                    artplayerPluginDanmuku({
+                      danmuku: comments,
+                    }),
+                  ]
+                : dlinks.danmaku
                 ? [
                     artplayerPluginDanmuku({
                       danmuku: dlinks.danmaku,
@@ -172,7 +206,14 @@ export function AP() {
               height: "300px",
               margin: "30px auto 0",
             }}
-            getInstance={(art) => console.info(art)}
+            getInstance={async (art) => {
+              const dan_conf = await {
+                danmuku: await getDanAction(dd_helper),
+              };
+              await art.plugins.artplayerPluginDanmuku.config(dan_conf);
+              await art.plugins.artplayerPluginDanmuku.load();
+              console.info(art.plugins.artplayerPluginDanmuku.option);
+            }}
           />
         )}
       </div>

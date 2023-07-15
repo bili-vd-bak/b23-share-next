@@ -1,5 +1,7 @@
 # 欢迎访问 b23-share-next
 
+# 访问 https://share.xrzyun.top 或 `src/pages/index.mdx`，获取最新READEME。
+
 请浏览 侧边栏(桌面端)/右上角**☰**(移动端) 以选择番剧仓库。  
 网站切页时无进度条，点击按钮后，服务器获取数据时请耐心等待。
 

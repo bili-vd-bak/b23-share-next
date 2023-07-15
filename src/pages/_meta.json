@@ -2,5 +2,8 @@
   "index": "首页",
   "lib": {
     "title": "仓库"
+  },
+  "toolbox": {
+    "title": "工具箱"
   }
 }
