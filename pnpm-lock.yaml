@@ -677,10 +677,10 @@ packages:
       get-intrinsic: registry.npmmirror.com/get-intrinsic@1.2.1
     dev: false
 
-  registry.npmmirror.com/caniuse-lite@1.0.30001515:
-    resolution: {integrity: sha512-eEFDwUOZbE24sb+Ecsx3+OvNETqjWIdabMy52oOkIgcUtAsQifjUG9q4U9dgTHJM2mfk4uEPxc0+xuFdJ629QA==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/caniuse-lite/-/caniuse-lite-1.0.30001515.tgz}
+  registry.npmmirror.com/caniuse-lite@1.0.30001516:
+    resolution: {integrity: sha512-Wmec9pCBY8CWbmI4HsjBeQLqDTqV91nFVR83DnZpYyRnPI1wePDsTg0bGLPC5VU/3OIZV1fmxEea1b+tFKe86g==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/caniuse-lite/-/caniuse-lite-1.0.30001516.tgz}
     name: caniuse-lite
-    version: 1.0.30001515
+    version: 1.0.30001516
     dev: false
 
   registry.npmmirror.com/ccount@2.0.1:
@@ -2645,7 +2645,7 @@ packages:
       '@next/env': registry.npmmirror.com/@next/env@13.4.4
       '@swc/helpers': registry.npmmirror.com/@swc/helpers@0.5.1
       busboy: registry.npmmirror.com/busboy@1.6.0
-      caniuse-lite: registry.npmmirror.com/caniuse-lite@1.0.30001515
+      caniuse-lite: registry.npmmirror.com/caniuse-lite@1.0.30001516
       postcss: registry.npmmirror.com/postcss@8.4.14
       react: registry.npmmirror.com/react@18.2.0
       react-dom: registry.npmmirror.com/react-dom@18.2.0(react@18.2.0)

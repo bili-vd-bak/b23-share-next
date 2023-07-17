@@ -84,9 +84,9 @@ function fmtEpInfoList(ori_info: info_file) {
 
 interface co_struct {
   video: string;
-  danmaku: boolean;
-  sub_chs: boolean;
-  sub_cht: boolean;
+  danmaku: boolean | string;
+  sub_chs: boolean | string;
+  sub_cht: boolean | string;
   dd_hash: string;
   dd_epid: number;
 }
@@ -115,14 +115,21 @@ function fmtEpList(ori_list: { name: string }[], epsInfo: ep[]) {
       ext = FTC.EXT(i.name);
     if (ext === "xml") {
       init_co_cache(fn);
-      co_cache[fn].danmaku = true;
+      co_cache[fn].danmaku = i.name;
     }
     if (ext === "srt") {
-      const subtitleHead = FTC.FNeEXT(fn);
-      const subtitleLanguage = FTC.EXT(fn);
+      const subtitleHead = FTC.FNeEXT(fn); //{number}----------
+      const subtitleLanguage = FTC.EXT(fn); //[zh-Hans/zh-Hant]
       init_co_cache(subtitleHead);
-      if (subtitleLanguage === "zh-Hans") co_cache[subtitleHead].sub_chs = true;
-      if (subtitleLanguage === "zh-Hant") co_cache[subtitleHead].sub_cht = true;
+      init_co_cache(fn);
+      // {number}----------.[zh-Hans/zh-Hant].srt 格式
+      if (subtitleLanguage === "zh-Hans")
+        co_cache[subtitleHead].sub_chs = i.name;
+      if (subtitleLanguage === "zh-Hant")
+        co_cache[subtitleHead].sub_cht = i.name;
+      // 视频同名 格式
+      co_cache[fn].sub_chs = i.name;
+      co_cache[fn].sub_cht = i.name;
     }
   }
   for (const i of ori_list) {
@@ -143,14 +150,16 @@ function fmtEpList(ori_list: { name: string }[], epsInfo: ep[]) {
         ot: info[3] || "", //文件名上备注的其它信息(第四段)
         co: {
           video: co_cache[fn]?.video || "unknown",
-          danmaku: co_cache[fn]?.danmaku || false,
+          danmaku: co_cache[fn]?.danmaku || co_cache[info[0]]?.danmaku || false,
           sub_chs:
-            co_cache[fn]?.sub_chs ||
-            co_cache[info[0] + "----------"]?.sub_chs ||
+            co_cache[fn]?.sub_chs || //同名
+            co_cache[info[0] + "----------"]?.sub_chs || //BBDown
+            co_cache[info[0]]?.sub_chs || //仅数字头
             false,
           sub_cht:
             co_cache[fn]?.sub_cht ||
             co_cache[info[0] + "----------"]?.sub_cht ||
+            co_cache[info[0]]?.sub_cht || //仅数字头
             false,
           dd_hash: epinfo?.dd_hash || "",
           dd_epid: epinfo?.dd_epid || 0,
@@ -216,10 +225,10 @@ export async function getVideoData(
   const info = ffn.split("-----");
   const id_lib_path = "/bangumi-index/md/";
   const fils = {
-    video: ffn + "." + co.video || "mp4",
-    danmaku: ffn + ".xml",
-    sub_chs: info[0] + "----------.zh-Hans.srt",
-    sub_cht: info[0] + "----------.zh-Hant.srt",
+    video: ffn + "." + (co.video || "mp4"),
+    danmaku: co.danmaku,
+    sub_chs: co.sub_chs,
+    sub_cht: co.sub_cht,
   };
   let dlinks = { video: "", danmaku: "", sub_chs: "", sub_cht: "" };
   let dd_helper = { hash: co.dd_hash, epid: co.dd_epid };

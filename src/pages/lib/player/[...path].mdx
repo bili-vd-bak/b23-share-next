@@ -207,11 +207,13 @@ export function AP() {
               margin: "30px auto 0",
             }}
             getInstance={async (art) => {
-              const dan_conf = await {
-                danmuku: await getDanAction(dd_helper),
-              };
-              await art.plugins.artplayerPluginDanmuku.config(dan_conf);
-              await art.plugins.artplayerPluginDanmuku.load();
+              if (dd_helper?.hash || dd_helper?.epid) {
+                const dan_conf = await {
+                  danmuku: await getDanAction(dd_helper),
+                };
+                await art.plugins.artplayerPluginDanmuku.config(dan_conf);
+                await art.plugins.artplayerPluginDanmuku.load();
+              }
               console.info(art.plugins.artplayerPluginDanmuku.option);
             }}
           />
