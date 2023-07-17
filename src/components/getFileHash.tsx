@@ -7,7 +7,9 @@ const getFileHash = async (buffer: ArrayBuffer) => {
   buffer = buffer.slice(0, length);
 
   // const array = Buffer.from(new Uint8Array(buffer));
-  const wordArray = Crypto.lib.WordArray.create(buffer);
+  const wordArray = Crypto.lib.WordArray.create(
+    Array.prototype.slice.call(new Uint8Array(buffer))
+  );
   const fileHash = Crypto.MD5(wordArray).toString();
   // crypto.createHash("md5").update(array).digest("hex");
 
@@ -77,7 +79,7 @@ const fetchComments = async (episodeId: string): Promise<Comment[]> => {
   return comments;
 };
 
-export const List = ({ data }) => {
+export const List = ({ data }: { data: any }) => {
   const listItems = data[1].matches.map((i: any) => (
     <tr key={i.episodeId}>
       <td>{i.episodeId}</td>
@@ -147,9 +149,9 @@ export default function Home() {
     setUrl(URL.createObjectURL(file));
     setComments(comments);
     setDescription(
-      `[${matchData[1].isMatched ? "精确" : "模糊"}匹配],文件信息：${JSON.stringify(
-        matchData[0]
-      )}`
+      `[${
+        matchData[1].isMatched ? "精确" : "模糊"
+      }匹配],文件信息：${JSON.stringify(matchData[0])}`
     );
     setData(matchData);
   };
