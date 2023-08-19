@@ -58,9 +58,6 @@ dependencies:
     version: registry.npmmirror.com/typescript@5.1.3
 
 devDependencies:
-  '@types/crypto-js':
-    specifier: ^4.1.1
-    version: registry.npmmirror.com/@types/crypto-js@4.1.1
   '@types/qs':
     specifier: ^6.9.7
     version: registry.npmmirror.com/@types/qs@6.9.7
@@ -463,12 +460,6 @@ packages:
     name: '@types/cookie'
     version: 0.3.3
     dev: false
-
-  registry.npmmirror.com/@types/crypto-js@4.1.1:
-    resolution: {integrity: sha512-BG7fQKZ689HIoc5h+6D2Dgq1fABRa0RbBWKBd9SP/MVRVXROflpm5fhwyATX5duFmbStzyzyycPB8qUYKDH3NA==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/@types/crypto-js/-/crypto-js-4.1.1.tgz}
-    name: '@types/crypto-js'
-    version: 4.1.1
-    dev: true
 
   registry.npmmirror.com/@types/d3-scale-chromatic@3.0.0:
     resolution: {integrity: sha512-dsoJGEIShosKVRBZB0Vo3C8nqSDqVGujJU6tPznsBJxNJNwMF8utmS83nvCBKQYPpjCzaaHcrf66iTRpZosLPw==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/@types/d3-scale-chromatic/-/d3-scale-chromatic-3.0.0.tgz}
