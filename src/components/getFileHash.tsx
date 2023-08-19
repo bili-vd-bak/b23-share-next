@@ -1,38 +1,39 @@
 import { useEffect, useRef, useState } from "react";
-import Crypto from "crypto-js";
+import { md5 } from "hash-wasm";
 
 const getFileHash = async (buffer: ArrayBuffer) => {
   // 计算前 16MB 的 MD5
   const length = 16 * 1024 * 1024;
   buffer = buffer.slice(0, length);
-
-  // const array = Buffer.from(new Uint8Array(buffer));
-  const wordArray = Crypto.lib.WordArray.create(
-    Array.prototype.slice.call(new Uint8Array(buffer))
-  );
-  const fileHash = Crypto.MD5(wordArray).toString();
-  // crypto.createHash("md5").update(array).digest("hex");
-
+  const fileHash = md5(new Uint8Array(buffer));
   return fileHash;
 };
 
-const matchAudio = async (file: File) => {
-  const arrayBuffer = await new Promise<ArrayBuffer>((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsArrayBuffer(file.slice(0, 16 * 1024 * 1024));
-    reader.onload = (e) => {
-      resolve(e.target?.result as ArrayBuffer);
-    };
-    reader.onerror = (e) => {
-      reject(e);
-    };
-  });
+const matchAudio = async (file?: File, title?: string, hash?: string) => {
+  let payload = {};
+  if (file) {
+    const arrayBuffer = await new Promise<ArrayBuffer>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsArrayBuffer(file.slice(0, 16 * 1024 * 1024));
+      reader.onload = (e) => {
+        resolve(e.target?.result as ArrayBuffer);
+      };
+      reader.onerror = (e) => {
+        reject(e);
+      };
+    });
 
-  const payload = {
-    fileHash: await getFileHash(arrayBuffer),
-    fileName: file.name,
-    fileSize: file.size,
-  };
+    payload = {
+      fileHash: await getFileHash(arrayBuffer),
+      fileName: file.name,
+      fileSize: file.size,
+    };
+  } else if (title || hash)
+    payload = {
+      fileHash: hash || "8733483666773cacbd79ac6f6ad56d6d",
+      fileName: title || "86",
+      fileSize: 0,
+    };
 
   const url = "https://api.dandanplay.net/api/v2/match";
 
@@ -90,9 +91,9 @@ export const List = ({ data }: { data: any }) => {
     </tr>
   ));
   return (
-    <table>
+    <table style={{ borderCollapse: "collapse", border: "1px solid black" }}>
       <thead>
-        <tr>
+        <tr style={{ border: "1px solid black" }}>
           <th>episodeId</th>
           <th>animeId</th>
           <th>animeTitle</th>
@@ -111,21 +112,36 @@ export default function Home() {
   const [comments, setComments] = useState<Comment[]>([]);
   const [url, setUrl] = useState<string>("");
 
-  const onPlay = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files) {
-      return;
-    }
+  const [titlename, setTitlename] = useState<string>("");
+  const [hash, setHash] = useState<string>("");
 
+  const onPlay = async (
+    e:
+      | React.ChangeEvent<HTMLInputElement>
+      | React.FormEventHandler<HTMLFormElement>
+      | any
+  ) => {
+    if (!e.target.files) e.preventDefault();
     setDescription("正在匹配");
-    const file = e.target.files[0];
-
     let matchData: any = null;
-    try {
-      matchData = await matchAudio(file);
-    } catch (e) {
-      console.error(e);
-      setDescription("匹配失败");
-      return;
+
+    if (e.target.files) {
+      const file = e.target.files[0];
+      try {
+        matchData = await matchAudio(file);
+      } catch (e) {
+        console.error(e);
+        setDescription("匹配失败");
+        return;
+      }
+    } else {
+      try {
+        matchData = await matchAudio(undefined, titlename, hash);
+      } catch (e) {
+        console.error(e);
+        setDescription("匹配失败");
+        return;
+      }
     }
 
     if (matchData[1].errorCode !== 0 || matchData[1]?.matches?.length === 0) {
@@ -146,8 +162,8 @@ export default function Home() {
     //   return;
     // }
 
-    setUrl(URL.createObjectURL(file));
-    setComments(comments);
+    // setUrl(URL.createObjectURL(file));
+    // setComments(comments);
     setDescription(
       `[${
         matchData[1].isMatched ? "精确" : "模糊"
@@ -173,12 +189,68 @@ export default function Home() {
         style={{
           marginTop: "20px",
           display: "flex",
-          flexDirection: "row",
+          flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
         }}
       >
-        <input type="file" onChange={onPlay} />
+        <div>
+          <input type="file" onChange={onPlay} />
+        </div>
+        <br />
+        <div>
+          <form onSubmit={onPlay}>
+            以下两项二选一填写，数据越全搜索越准。
+            <br />
+            番剧名(空格+集数)：
+            <input
+              onChange={(e) => {
+                setTitlename(e.target.value);
+              }}
+              style={{
+                width: "100%",
+                padding: "5px 16px",
+                margin: "8px 0",
+                display: "inline-block",
+                border: "1px solid #ccc",
+                borderRadius: "4px",
+                boxSizing: "border-box",
+              }}
+            />
+            <br />
+            前16MB MD5值：
+            <input
+              onChange={(e) => {
+                setHash(e.target.value);
+              }}
+              style={{
+                width: "100%",
+                padding: "5px 16px",
+                margin: "8px 0",
+                display: "inline-block",
+                border: "1px solid #ccc",
+                borderRadius: "4px",
+                boxSizing: "border-box",
+              }}
+            />
+            <br />
+            <button
+              type="submit"
+              style={{
+                width: "100%",
+                backgroundColor: "#4CAF50",
+                color: "white",
+                padding: "5px 16px",
+                margin: "8px 0",
+                border: "none",
+                borderRadius: "4px",
+                cursor: "pointer",
+              }}
+            >
+              搜索
+            </button>
+          </form>
+        </div>
       </div>
     </main>
   );
