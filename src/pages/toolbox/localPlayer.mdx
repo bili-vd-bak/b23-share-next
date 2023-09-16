@@ -1,6 +1,6 @@
-import Home from "@/components/LocalPlayer";
-
 ## 帮助
+
+[一个网页端本地视频播放器(可以调用 dandanplay 弹幕，加载 srt 字幕)](https://www.xrzyun.top/toolbox/localplayer)
 
 本播放器可播放本地视频，并支持读取`.mkv`的内置字幕(通过 ffmpeg wasm 实现)。  
 每次使用前需下载约 31MB 的 ffmpeg 库，(进度条功能在做了.jpg)。  
@@ -8,16 +8,8 @@ import Home from "@/components/LocalPlayer";
 会自动匹配 dandanplay 弹幕库。  
 播放视频编码支持取决于浏览器。  
 **使用的最基本前提**：浏览器支持**WASM**(WebAssembly)功能。  
-**请不要刷新本页面，否则一定会报错**。  
 即将(n 月后)支持的功能：
 
 - 下载进度条
 - 输入 dandanplay epID 下载弹幕
 - 通过 ffmpeg 实时转码以支持`HEVC` `AV1`在不支持平台上的播放。
-
-## 工具
-
-<div style={{ overflow: "auto" }}>
-  手机端可滑动本行文字调整播放器位置，全屏(横屏)以取得正确字幕、弹幕位置。
-  <Home />
-</div>
