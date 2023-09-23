@@ -9,7 +9,9 @@ async function getRaw(accesskey: string, path: string) {
     access_tokens_base64: accesskey,
     path: path,
   });
-  return fetch(res?.dlinks[0].dlink).then((res) => res.json());
+  return res?.dlinks[0]
+    ? fetch(res?.dlinks[0].dlink).then((res) => res.json())
+    : "";
 }
 
 async function getAllList(
@@ -146,7 +148,7 @@ function fmtEpList(ori_list: { name: string }[], epsInfo: ep[]) {
         ep: ep || 0, //集数
         qn: info[1] || "未知", //清晰度
         fn: info[2] || "未知", //编码方式
-        sn: epinfo?.share_copy || epinfo || "", //B站上本集标题
+        sn: epinfo?.share_copy || (typeof epinfo === "string" ? epinfo : ""), //B站上本集标题
         ot: info[3] || "", //文件名上备注的其它信息(第四段)
         co: {
           video: co_cache[fn]?.video || "unknown",
@@ -193,7 +195,14 @@ export async function getEp(accesskey: string, id: string) {
   const id_lib_path = "/bangumi-index/md/";
   const info_file = "info.json";
   const info = fmtEpInfoList(
-    await getRaw(accesskey, id_lib_path + id + "/" + info_file)
+    (await getRaw(accesskey, id_lib_path + id + "/" + info_file)) || {
+      code: 0,
+      result: {
+        title: "无",
+        evaluate: "（番剧简介）本仓库暂无info.json信息文件。",
+        episodes: [],
+      },
+    }
   );
   const res = await apis.od.item({
     access_tokens_base64: accesskey,
