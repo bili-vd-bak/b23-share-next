@@ -63,6 +63,7 @@ interface ep {
 }
 
 function fmtEpInfoList(ori_info: info_file) {
+  //TODO 添加对 biliintl 的 ep 格式支持：modules-data-episodes
   const ok = ori_info.code === 0 && !!ori_info.result;
   /**
    * info_file进，episodes出
