@@ -1,3 +1,6 @@
+import { Steps } from "nextra/components";
+import { FileTree } from "nextra/components";
+
 # 欢迎访问 b23-share-next
 
 > 旧仓库已废弃，请在此重新查找。(从 bili-vd-bak 跳转过来的番剧位于`core` `extra`仓库)
@@ -40,9 +43,19 @@ API 提供：
 
 ## 您也想分享番剧？
 
-1. 获取一个 OneDrive 国际版企业/教育号(支持 sharepoint 分享)，可为 E5/A1 等。
-2. (根目录 `/`)新建`bangumi-index`文件夹。
-3. (`/bangumi-index/`)新建`id_name_dic.json`，写入
+中括号`[]`内为步骤位于目录。
+
+<Steps>
+### 获取账号
+获取一个 OneDrive 国际版企业/教育号(支持 sharepoint 分享)，可为 E5/A1 等。
+
+### 分配目录 [根目录 `/`]
+
+新建`bangumi-index`文件夹。
+
+### 新建索引文件 [`/bangumi-index/`]
+
+新建`id_name_dic.json`，写入
 
 ```json filename="id_name_dic.json"
 {
@@ -54,9 +67,17 @@ API 提供：
 }
 ```
 
-4. (`/bangumi-index/`)新建`md`文件夹。
-5. (`/bangumi-index/md/`)新建`番剧ID`文件夹。
-6. (`/bangumi-index/md/番剧ID/`)新建`info.json`,写入(`episodes`中第 n 个`share_copy`代表第 n 集的标题)
+### 新建 ID 文件夹 [`/bangumi-index/`]
+
+新建`md`文件夹。
+
+### 范例：以某 ID 分配某番剧 [`/bangumi-index/md/`]
+
+新建`番剧ID`文件夹。
+
+### 范例：为某番剧添加信息 [`/bangumi-index/md/番剧ID/`]
+
+新建`info.json`,写入(`episodes`中第 n 个`share_copy`代表第 n 集的标题)
 
 |                   项目                   |                                                   说明                                                   |
 | :--------------------------------------: | :------------------------------------------------------------------------------------------------------: |
@@ -91,12 +112,14 @@ API 提供：
 }
 ```
 
-7. (`/bangumi-index/md/番剧ID/`)上传视频(mp4/mkv)、弹幕(B 站格式 xml)、字幕(srt)，会自动识别有无弹幕、字幕。  
-    单分隔符为 5 个-，即`-----`；字幕为双分隔符 10 个-，即`----------`  
-    ~~弹幕请保证与视频同名，字幕可同名(与视频一一对应)或匹配同集通用字幕`{集数(整数)}----------[zh-Hans|zh-Hant].srt`~~  
-   **视频**: 合法格式`1-----1080P-----HEVC.mp4` `2-----720P 60帧-----AVC-----其它信息.mkv`  
-   **弹幕**: 合法格式`1-----1080P-----HEVC.xml` `2-----720P 60帧-----AVC-----其它信息.xml` `3.xml`  
-   **字幕**: 合法格式`1-----1080P-----HEVC.srt` `2----------.zh-Hans.srt` `3.srt`
+### 范例：为某番剧添加视频、弹幕、字幕 [`/bangumi-index/md/番剧ID/`]
+
+上传视频(mp4/mkv)、弹幕(B 站格式 xml)、字幕(srt)，会自动识别有无弹幕、字幕。  
+ 单分隔符为 5 个-，即`-----`；字幕为双分隔符 10 个-，即`----------`  
+ ~~弹幕请保证与视频同名，字幕可同名(与视频一一对应)或匹配同集通用字幕`{集数(整数)}----------[zh-Hans|zh-Hant].srt`~~  
+ **视频**: 合法格式`1-----1080P-----HEVC.mp4` `2-----720P 60帧-----AVC-----其它信息.mkv`  
+ **弹幕**: 合法格式`1-----1080P-----HEVC.xml` `2-----720P 60帧-----AVC-----其它信息.xml` `3.xml`  
+ **字幕**: 合法格式`1-----1080P-----HEVC.srt` `2----------.zh-Hans.srt` `3.srt`
 
 ```text filename="视频/弹幕"
 {集数(整数)}-----{清晰度(字符串)}-----{编码方式(字符串)}(-----{其他信息(字符串)}).[mp4|mkv|xml]
@@ -116,26 +139,41 @@ API 提供：
 |   2    | 字幕:`{集数(整数)}----------.[zh-Hans/zh-Hant].srt`(BBDown) |
 |   3    |                  `{集数(整数)}.[xml/srt]`                   |
 
-8. 分享`bangumi-index`文件夹(不要设密码)，获取链接。(详情参考本 Github 上`src/pages/lib/extra.mdx`里`sharelink`)
+### 分享文件夹
 
-```text filename="此时你OneDrive里的样子"
-/
-└bangumi-index
-  ├md
-  │ ├番剧ID
-  │ │ ├1-----1080P-----HEVC.mp4
-  │ │ ├1-----1080P-----HEVC.xml
-  │ │ ├1----------.srt
-  │ │ ├2-----720P 60帧-----AVC-----其它信息.mkv
-  │ │ ├2-----720P 60帧-----AVC-----其它信息.xml
-  │ │ ├1024-----4K-----AV1-----集数无需连续.mp4
-  │ │ └info.json
-  │ ├custom01
-  │ │ └...
-  │ └...
-  └id_name_dic.json
-```
+分享`bangumi-index`文件夹(不要设密码)，获取链接。(详情参考本 Github 上`src/pages/lib/extra.mdx`里`sharelink`)
 
-9. 向本仓库发 PR，在`src/pages/lib/`下创建`{你的仓库名}.mdx`文件(以`core.mdx`为模板)，修改第 6 行`sharelink`为你的分享链接。
-10. (可选)修改 mdx 下面的说明、`src/pages/lib/_meta.json`(修改侧边栏中你仓库的名字)。
-11. 等待 PR 通过。
+此时你 OneDrive 里的样子:
+
+<FileTree>
+  <FileTree.Folder name="bangumi-index" defaultOpen>
+    <FileTree.Folder name="md" defaultOpen>
+      <FileTree.Folder name="番剧ID" defaultOpen>
+        <FileTree.File name="1-----1080P-----HEVC.mp4" />
+        <FileTree.File name="1-----1080P-----HEVC.xml" />
+        <FileTree.File name="1----------.srt" />
+        <FileTree.File name="2-----720P 60帧-----AVC-----其它信息.mkv" />
+        <FileTree.File name="2-----720P 60帧-----AVC-----其它信息.xml" />
+        <FileTree.File name="1024-----4K-----AV1-----集数无需连续.mp4" />
+        <FileTree.File name="info.json" />
+      </FileTree.Folder>
+      <FileTree.Folder name="custom1" />
+      <FileTree.Folder name="..." />
+    </FileTree.Folder>
+    <FileTree.File name="id_name_dic.json" />
+  </FileTree.Folder>
+</FileTree>
+
+### 向本仓库提交申请
+
+向本仓库发 PR，在`src/pages/lib/`下创建`{你的仓库名}.mdx`文件(以`core.mdx`为模板)，修改第 6 行`sharelink`为你的分享链接。
+
+### 修改仓库名(可选)
+
+修改 mdx 下面的说明、`src/pages/lib/_meta.json`(修改侧边栏中你仓库的名字)。
+
+### 结束
+
+等待 PR 通过。
+
+</Steps>
