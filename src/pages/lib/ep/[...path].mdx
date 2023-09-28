@@ -7,7 +7,7 @@ export function getStaticPaths() {
   //this property is an Array of URLs ("paths") that should be statically generated at build-time. The returned paths must match the dynamic route shape.
   return {
     paths: [],
-    fallback: false,
+    fallback: "blocking",
   };
 }
 
