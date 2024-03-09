@@ -3,7 +3,7 @@
  * @param FileName string
  */
 export function EXT(FileName: string) {
-  return FileName.split(".").pop() || "Null";
+  return FileName?.split(".").pop() || "Null";
 }
 
 /**
@@ -12,5 +12,5 @@ export function EXT(FileName: string) {
  * @returns
  */
 export function FNeEXT(FileName: string) {
-  return FileName.substring(0, FileName.lastIndexOf("."));
+  return FileName?.substring(0, FileName?.lastIndexOf("."));
 }

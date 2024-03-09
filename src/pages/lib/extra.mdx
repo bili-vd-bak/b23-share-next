@@ -9,12 +9,13 @@ export const sharelink =
   "https://xrzcloud-my.sharepoint.com/:f:/g/personal/xrz_xrzapi_eu_org/EtnvTU56yoFDg4UlWvCl4owBXMCGKcPwRoaJaUi2zOTT2A?e=yRTdQ7";
 
 export const getStaticProps = async ({ params }) => {
-  const a = await getList(sharelink);
+  const accesskey = await getAccesskey(sharelink),
+    list = await getList(accesskey);
   return {
     props: {
       ssg: {
-        accesskey: a.accesskey,
-        list: a.list,
+        accesskey: accesskey,
+        list: list,
       },
     },
     revalidate: 3600,

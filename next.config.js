@@ -1,6 +1,30 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  async rewrites() {
+    return [
+      {
+        source: "/api/me",
+        destination: "/api/alist/me",
+      },
+      {
+        source: "/api/auth/:path",
+        destination: "/api/alist/auth/:path*",
+      },
+      {
+        source: "/api/fs/:path",
+        destination: "/api/alist/fs/:path*",
+      },
+      {
+        source: "/api/public/:path",
+        destination: "/api/alist/public/:path*",
+      },
+      {
+        source: "/api/auth/admin/:path",
+        destination: "/api/alist/admin/:path*",
+      },
+    ];
+  },
   async redirects() {
     return [
       {

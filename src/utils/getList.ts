@@ -152,7 +152,7 @@ function fmtEpList(ori_list: { name: string }[], epsInfo: ep[]) {
         sn: epinfo?.share_copy || (typeof epinfo === "string" ? epinfo : ""), //B站上本集标题
         ot: info[3] || "", //文件名上备注的其它信息(第四段)
         co: {
-          video: co_cache[fn]?.video || "unknown",
+          video: co_cache[fn]?.video || "unknown", // mp4/mkv/...
           danmaku: co_cache[fn]?.danmaku || co_cache[info[0]]?.danmaku || false,
           sub_chs:
             co_cache[fn]?.sub_chs || //同名
@@ -173,13 +173,18 @@ function fmtEpList(ori_list: { name: string }[], epsInfo: ep[]) {
   return fmt_list;
 }
 
-export async function getList(sharelink: string) {
-  const id_name_dic_path = "/bangumi-index/id_name_dic.json";
-  const id_lib_path = "/bangumi-index/md/";
+export async function getAccesskey(sharelink: string) {
   const accesskey = encodeURI(
     JSON.stringify(await apis.od.getAccessToken(sharelink))
   );
-  const id_name_dic = await getRaw(accesskey, id_name_dic_path);
+  return accesskey;
+}
+
+export async function getList(accesskey: string, path?: string, fmt = true) {
+  const id_name_dic_path = "/bangumi-index/id_name_dic.json";
+  const id_lib_path = path || "/bangumi-index/md/";
+  // const id_name_dic = await getRaw(accesskey, id_name_dic_path);
+  // console.log(id_lib_path)
   const res = await apis.od.item({
     access_tokens_base64: accesskey,
     path: id_lib_path,
@@ -187,9 +192,12 @@ export async function getList(sharelink: string) {
   list = res.items[0].folder.value;
   if (res.items[0].folder.nextPageToken)
     await getAllList(accesskey, id_lib_path, res.items[0].folder.nextPageToken);
-  const fmt_list = fmtIDList(list, id_name_dic);
+  console.log(list);
+  const fmt_list: { name: string; id: string }[] = fmt
+    ? fmtIDList(list, await getRaw(accesskey, id_name_dic_path))
+    : list;
   list = [];
-  return { list: fmt_list, accesskey: accesskey };
+  return fmt_list;
 }
 
 export async function getEp(accesskey: string, id: string) {

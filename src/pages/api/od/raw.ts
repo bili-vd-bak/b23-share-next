@@ -67,14 +67,22 @@ export async function onedrive_raw({ path = "", access_tokens_base64 = "" }) {
   let arr1 = [];
   for (const i of access_tokens.r) {
     let access_token = i.accesskey;
-    let data = await getRaw(i.api, path, access_token);
+    let data;
+
+    const re_gen_accesskey = async () => {
+      // console.log("re_gen_accesskey");
+      const access_tokens = (await getAccessTokens(i.sharelink)).r[0];
+      access_token = (await getAccessTokens(i.sharelink)).r[0].accesskey;
+      data = await getRaw(access_tokens.api, path, access_token);
+    };
+
+    if (access_token === "dynamic") await re_gen_accesskey();
+    else data = await getRaw(i.api, path, access_token);
     if (
       data.error?.code === "unauthenticated" &&
       data.error?.innerError?.code === "expiredToken"
-    ) {
-      access_token = (await getAccessTokens(i.sharelink)).r[0].accesskey;
-      data = await getRaw(i.api, path, access_token);
-    }
+    )
+      await re_gen_accesskey();
     if (data["@content.downloadUrl"]) {
       const downloadUrl: string = data["@content.downloadUrl"];
       arr1.push({ sharelink: i.sharelink, dlink: downloadUrl });

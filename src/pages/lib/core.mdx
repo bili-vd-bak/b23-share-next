@@ -1,5 +1,5 @@
 import { useSSG } from "nextra/ssg";
-import { getList } from "@/utils/getList";
+import { getAccesskey, getList } from "@/utils/getList";
 import Link from "next/link";
 import { decode } from "js-base64";
 import * as FTC from "@/utils/FileTypeCheck";
@@ -9,12 +9,13 @@ export const sharelink =
   "https://xrzcloud-my.sharepoint.com/:f:/g/personal/repository_xrzapi_eu_org/Egzw0ugxHrpCkFUA9CMyFDsB-3WxRaYj_E46k4Scn8BHkQ?e=AqGU4p";
 
 export const getStaticProps = async ({ params }) => {
-  const a = await getList(sharelink);
+  const accesskey = await getAccesskey(sharelink),
+    list = await getList(accesskey);
   return {
     props: {
       ssg: {
-        accesskey: a.accesskey,
-        list: a.list,
+        accesskey: accesskey,
+        list: list,
       },
     },
     revalidate: 3600,

@@ -45,16 +45,16 @@ function DataHandler(data: any) {
       "$skiptoken"
     );
   }
-  delete data["@odata.nextLink"];
-  if ("value" in data) {
-    for (const i of data.value) {
-      delete i["@odata.etag"];
-      if ("file" in i) delete i["file"]["hashes"];
-    }
-  } else {
-    delete data["@odata.etag"];
-    if ("file" in data) delete data["file"]["hashes"];
-  }
+  // delete data["@odata.nextLink"];
+  // if ("value" in data) {
+  //   for (const i of data.value) {
+  //     delete i["@odata.etag"];
+  //     if ("file" in i) delete i["file"]["hashes"];
+  //   }
+  // } else {
+  //   delete data["@odata.etag"];
+  //   if ("file" in data) delete data["file"]["hashes"];
+  // }
   return data;
 }
 
@@ -104,14 +104,26 @@ export async function onedrive_item({
     if (i.accesskey) {
       let access_token = i.accesskey;
       let data: any;
-      data = await getItem(i.api, path, nextPageToken, access_token);
+
+      const re_gen_accesskey = async () => {
+        // console.log("re_gen_accesskey");
+        const access_tokens = (await getAccessTokens(i.sharelink)).r[0];
+        access_token = access_tokens.accesskey;
+        data = await getItem(
+          access_tokens.api,
+          path,
+          nextPageToken,
+          access_token
+        );
+      };
+
+      if (access_token === "dynamic") await re_gen_accesskey();
+      else data = await getItem(i.api, path, nextPageToken, access_token);
       if (
         data.error?.code === "unauthenticated" &&
         data.error?.innerError?.code === "expiredToken"
-      ) {
-        access_token = (await getAccessTokens(i.sharelink)).r[0].accesskey;
-        data = await getItem(i.api, path, nextPageToken, access_token);
-      }
+      )
+        await re_gen_accesskey();
       data = DataHandler(data);
       if (!data) data = { value: [] };
       arr1.push({ sharelink: i.sharelink, folder: data });
