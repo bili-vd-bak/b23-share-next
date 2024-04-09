@@ -23,6 +23,10 @@ const nextConfig = {
         source: "/api/auth/admin/:path",
         destination: "/api/alist/admin/:path*",
       },
+      {
+        source: "/api/ddplay/:path",
+        destination: "https://api.dandanplay.net/:path*",
+      },
     ];
   },
   async redirects() {
@@ -46,6 +50,23 @@ const nextConfig = {
           {
             key: "Cross-Origin-Embedder-Policy",
             value: "require-corp",
+          },
+        ],
+      },
+      {
+        source: "/api/ddplay/:path*",
+        headers: [
+          {
+            key: "Access-Control-Allow-Origin",
+            value: "*",
+          },
+          {
+            key: "Access-Control-Allow-Methods",
+            value: "GET, POST, OPTIONS",
+          },
+          {
+            key: "Access-Control-Allow-Headers",
+            value: "Content-Type, Authorization",
           },
         ],
       },

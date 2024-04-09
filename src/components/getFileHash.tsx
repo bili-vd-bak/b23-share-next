@@ -35,7 +35,8 @@ const matchAudio = async (file?: File, title?: string, hash?: string) => {
       fileSize: 0,
     };
 
-  const url = "https://api.dandanplay.net/api/v2/match";
+  // const url = "https://api.dandanplay.net/api/v2/match";
+  const url = "/api/ddplay/api/v2/match";
 
   const response = await fetch(url, {
     method: "POST",
@@ -59,7 +60,8 @@ type Comment = {
 };
 
 const fetchComments = async (episodeId: string): Promise<Comment[]> => {
-  const url = `https://api.dandanplay.net/api/v2/comment/${episodeId}?withRelated=true&chConvert=1`;
+  // const url = `https://api.dandanplay.net/api/v2/comment/${episodeId}?withRelated=true&chConvert=1`;
+  const url = `/api/ddplay/api/v2/comment/${episodeId}?withRelated=true&chConvert=1`;
 
   const response = await fetch(url);
   const data = await response.json();
