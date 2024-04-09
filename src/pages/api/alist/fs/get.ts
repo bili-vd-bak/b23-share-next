@@ -57,7 +57,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
     ) {
       c = {
         name: path[1] || "",
-        size: 0,
+        size: 0, //TODO size get
         is_dir: true,
         modified: "1970-01-01T00:00:00+00:00",
         sign: "",
