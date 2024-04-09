@@ -2,7 +2,8 @@ import { getEp, getList, getVideoData } from "@/utils/getList";
 import type { NextApiRequest, NextApiResponse } from "next";
 import _lib from "@/pages/lib/_lib.json";
 import { EXT } from "@/utils/FileTypeCheck";
-import { encodeURI } from "js-base64";
+import { encodeURI, decode } from "js-base64";
+import * as FTC from "@/utils/FileTypeCheck";
 
 interface alist_fs {
   name: string;
@@ -28,6 +29,19 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
             "core",
             "eyJ0IjoxNzA3NjY0NjI1LjcxNywiciI6W3sic2hhcmVsaW5rIjoiaHR0cHM6Ly94cnpjbG91ZC1teS5zaGFyZXBvaW50LmNvbS86ZjovZy9wZXJzb25hbC9yZXBvc2l0b3J5X3hyemFwaV9ldV9vcmcvRWd6dzB1Z3hIcnBDa0ZVQTlDTXlGRHNCLTNXeFJhWWpfRTQ2azRTY244QkhrUT9lPUFxR1U0cCIsIm9yZ2RvbWFpbiI6Imh0dHBzOi8veHJ6Y2xvdWQtbXkuc2hhcmVwb2ludC5jb20iLCJhY2Nlc3NrZXkiOiJkeW5hbWljIiwiYXBpIjoiZHluYW1pYyJ9XX0",
           ];
+
+  const timestamp = () => Date.now() / 1000 || 0;
+  const decode_accesskey = JSON.parse(decode(u_info[1]));
+  const jwt_payload = JSON.parse(
+    decode(FTC.EXT(FTC.FNeEXT(decode_accesskey.r[0].accesskey)))
+  );
+  if (timestamp() >= jwt_payload.exp - 60)
+    res.status(405).send({
+      code: 405,
+      message: "login info exp",
+      data: null,
+    });
+
   async function cc() {
     const lib: { [key: string]: string } = _lib,
       lib_id = u_info[0] || "core",
