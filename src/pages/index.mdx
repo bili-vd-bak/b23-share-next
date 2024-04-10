@@ -21,6 +21,32 @@ import { FileTree } from "nextra/components";
 |                        `ext`                         | 前缀，表`其它ID类别`+`custom`  |
 |                        `intl`                        |  前缀，表`B站东南亚`+`ss/ep`   |
 
+## dandanplay api
+
+鉴于 api.dandanplay.net 启用了`CORS`却配置了禁止`OPTIONS`请求，故无法在 WEB 直接请求，因此提供了其 proxy:  
+`https://{当前域名}/api/ddplay/:path*` --> `https://api.dandanplay.net/:path*`  
+请求头配置:
+
+```json
+{
+  "source": "/api/ddplay/:path*",
+  "headers": [
+    {
+      "key": "Access-Control-Allow-Origin",
+      "value": "*"
+    },
+    {
+      "key": "Access-Control-Allow-Methods",
+      "value": "GET, POST, OPTIONS"
+    },
+    {
+      "key": "Access-Control-Allow-Headers",
+      "value": "Content-Type, Authorization"
+    }
+  ]
+}
+```
+
 ## 感谢
 
 API 提供：
@@ -75,7 +101,7 @@ API 提供：
 
 新建`番剧ID`文件夹。
 
-### 范例：为某番剧添加信息 [`/bangumi-index/md/番剧ID/`]
+### 范例：为某番剧添加信息 [`/bangumi-index/md/番剧 ID/`]
 
 新建`info.json`,写入(`episodes`中第 n 个`share_copy`代表第 n 集的标题)
 
@@ -112,7 +138,7 @@ API 提供：
 }
 ```
 
-### 范例：为某番剧添加视频、弹幕、字幕 [`/bangumi-index/md/番剧ID/`]
+### 范例：为某番剧添加视频、弹幕、字幕 [`/bangumi-index/md/番剧 ID/`]
 
 上传视频(mp4/mkv)、弹幕(B 站格式 xml)、字幕(srt)，会自动识别有无弹幕、字幕。  
  单分隔符为 5 个-，即`-----`；字幕为双分隔符 10 个-，即`----------`  

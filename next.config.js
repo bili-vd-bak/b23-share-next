@@ -24,7 +24,7 @@ const nextConfig = {
         destination: "/api/alist/admin/:path*",
       },
       {
-        source: "/api/ddplay/:path",
+        source: "/api/ddplay/:path*",
         destination: "https://api.dandanplay.net/:path*",
       },
     ];
