@@ -31,9 +31,9 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
     decode(FTC.EXT(FTC.FNeEXT(decode_accesskey.r[0].accesskey)))
   );
   if (timestamp() >= jwt_payload.exp - 60)
-    res.status(405).send({
-      code: 405,
-      message: "login info exp",
+    res.send({
+      code: 500,
+      message: "Token is expired",
       data: null,
     });
 
