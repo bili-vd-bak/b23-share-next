@@ -32,7 +32,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
   );
   if (timestamp() >= jwt_payload.exp - 60)
     res.send({
-      code: 500,
+      code: 401,
       message: "Token is expired",
       data: null,
     });
